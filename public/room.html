@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WatchParty — Room</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="room-info">
+        🎬 <span id="roomLabel"></span>
+        <button id="copyLinkBtn" title="Copier le lien d'invitation">🔗 Copier le lien</button>
+      </div>
+      <div class="controls">
+        <button id="toggleCamBtn" class="off">📷 Activer la caméra</button>
+        <button id="toggleMicBtn" class="off">🎤 Activer le micro</button>
+        <label id="uploadLabel" class="uploadLabel" style="display:none">
+          📁 Choisir une vidéo
+          <input type="file" id="videoFileInput" accept="video/*" hidden />
+        </label>
+        <span id="hostBadge" class="host-badge" style="display:none">👑 Tu es l'hôte</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="video-area">
+        <div id="uploadStatus"></div>
+        <video id="mainVideo" controls></video>
+        <div id="reactionsLayer" class="reactions-layer"></div>
+        <div class="reaction-bar">
+          <button class="reaction-btn" data-emoji="😂">😂</button>
+          <button class="reaction-btn" data-emoji="😍">😍</button>
+          <button class="reaction-btn" data-emoji="😱">😱</button>
+          <button class="reaction-btn" data-emoji="👏">👏</button>
+          <button class="reaction-btn" data-emoji="🔥">🔥</button>
+          <button class="reaction-btn" data-emoji="😢">😢</button>
+          <button class="reaction-btn" data-emoji="❤️">❤️</button>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="playlist-panel">
+          <div class="playlist-header">🎞️ Playlist</div>
+          <div id="playlistItems" class="playlist-items"></div>
+        </div>
+
+        <div id="videoGrid" class="video-grid"></div>
+
+        <div class="chat">
+          <div id="chatMessages" class="chat-messages"></div>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" placeholder="Écris un message..." autocomplete="off" />
+            <button type="submit">Envoyer</button>
+          </form>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

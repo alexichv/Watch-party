@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WatchParty</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="landing">
+    <h1>🎬 WatchParty</h1>
+    <p class="subtitle">Regardez un film ensemble, en appel vidéo, avec chat.</p>
+
+    <div class="card">
+      <h2>Créer une room</h2>
+      <input id="pseudoCreate" placeholder="Ton pseudo" />
+      <button id="createBtn">Créer une nouvelle room</button>
+    </div>
+
+    <div class="card">
+      <h2>Rejoindre une room</h2>
+      <input id="pseudoJoin" placeholder="Ton pseudo" />
+      <input id="roomIdJoin" placeholder="Code de la room" />
+      <button id="joinBtn">Rejoindre</button>
+    </div>
+  </div>
+
+  <script>
+    function randomRoomId() {
+      return Math.random().toString(36).substring(2, 8);
+    }
+
+    document.getElementById('createBtn').onclick = () => {
+      const pseudo = document.getElementById('pseudoCreate').value.trim() || 'Invité';
+      const roomId = randomRoomId();
+      window.location.href = `room.html?room=${roomId}&pseudo=${encodeURIComponent(pseudo)}`;
+    };
+
+    document.getElementById('joinBtn').onclick = () => {
+      const pseudo = document.getElementById('pseudoJoin').value.trim() || 'Invité';
+      const roomId = document.getElementById('roomIdJoin').value.trim();
+      if (!roomId) return alert('Entre un code de room');
+      window.location.href = `room.html?room=${roomId}&pseudo=${encodeURIComponent(pseudo)}`;
+    };
+  </script>
+</body>
+</html>
