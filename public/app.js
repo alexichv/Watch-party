@@ -44,6 +44,7 @@ socket.on('video-ready', ({ url, name }) => {
   mainVideo.src = url;
   uploadStatus.textContent = `Lecture de : ${name}`;
   mainVideo.play().catch(() => {});
+  if (typeof castSession !== 'undefined' && castSession) loadCurrentVideoOnCast();
 });
 
 let currentPlaylist = [];
@@ -421,35 +422,63 @@ function spawnFloatingEmoji(emoji) {
   setTimeout(() => el.remove(), 2600);
 }
 
-// ---------- Caster (Chromecast / AirPlay) ----------
+// ---------- Caster (vrai SDK Google Cast, celui utilisé par YouTube) ----------
 const castBtn = document.getElementById('castBtn');
+let castContext = null;
+let castSession = null;
 
-if ('remote' in mainVideo) {
-  // Chrome / Edge : API Remote Playback, ouvre le sélecteur Chromecast natif
-  // et lance lui-même la recherche des appareils sur le réseau
-  castBtn.style.display = 'inline-flex';
-  castBtn.addEventListener('click', async () => {
-    try {
-      await mainVideo.remote.prompt();
-    } catch (err) {
-      console.warn('Cast annulé ou aucun appareil trouvé', err);
-      alert("Aucun appareil de cast trouvé sur le réseau (vérifie que ton Chromecast est sur le même Wi-Fi)");
-    }
+window['__onGCastApiAvailable'] = (isAvailable) => {
+  if (!isAvailable || !window.cast || !window.chrome) return;
+
+  castContext = cast.framework.CastContext.getInstance();
+  castContext.setOptions({
+    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
   });
-} else if (typeof mainVideo.webkitShowPlaybackTargetPicker === 'function') {
-  // Safari : AirPlay
+
+  castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, () => {
+    castSession = castContext.getCurrentSession();
+    if (castSession && mainVideo.src) loadCurrentVideoOnCast();
+  });
+
   castBtn.style.display = 'inline-flex';
-  castBtn.textContent = '📺 AirPlay';
-  castBtn.addEventListener('click', () => {
+};
+
+function loadCurrentVideoOnCast() {
+  if (!castSession) return;
+  const mediaInfo = new chrome.cast.media.MediaInfo(mainVideo.src, 'video/mp4');
+  mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+  mediaInfo.metadata.title = 'WatchParty';
+  const request = new chrome.cast.media.LoadRequest(mediaInfo);
+  request.currentTime = mainVideo.currentTime;
+  request.autoplay = !mainVideo.paused;
+  castSession.loadMedia(request).catch((err) => console.warn('Erreur chargement cast', err));
+}
+
+castBtn.addEventListener('click', () => {
+  if (typeof mainVideo.webkitShowPlaybackTargetPicker === 'function' && !castContext) {
+    // Safari : AirPlay
     mainVideo.webkitShowPlaybackTargetPicker();
-  });
-} else {
-  // Navigateur sans API de cast (ex: Firefox) : le bouton reste visible
-  // mais explique pourquoi ça ne marche pas plutôt que de rester muet
+    return;
+  }
+  if (!castContext) {
+    alert("Le cast prend quelques secondes à s'initialiser après le chargement de la page, réessaie dans un instant.");
+    return;
+  }
+  castContext.requestSession()
+    .then(() => {
+      castSession = castContext.getCurrentSession();
+      loadCurrentVideoOnCast();
+    })
+    .catch((err) => {
+      if (err !== 'cancel') console.warn('Cast annulé ou aucun appareil trouvé', err);
+    });
+});
+
+// Sur Safari (pas de SDK Google Cast disponible), on active AirPlay directement
+if (!window.chrome && typeof mainVideo.webkitShowPlaybackTargetPicker === 'function') {
   castBtn.style.display = 'inline-flex';
-  castBtn.addEventListener('click', () => {
-    alert("Ton navigateur ne supporte pas le cast direct. Essaie avec Chrome, Edge ou Safari.");
-  });
+  castBtn.textContent = '📺 Caster (AirPlay)';
 }
 
 // ---------- Copier le lien ----------
