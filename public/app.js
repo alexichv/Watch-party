@@ -386,10 +386,23 @@ micBtn.onclick = toggleMic;
 // ---------- Réactions emoji flottantes ----------
 const reactionsLayer = document.getElementById('reactionsLayer');
 
+document.getElementById('emojiToggleBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('emojiPicker').classList.toggle('hidden');
+});
+
+document.addEventListener('click', (e) => {
+  const picker = document.getElementById('emojiPicker');
+  if (!picker.classList.contains('hidden') && !picker.contains(e.target)) {
+    picker.classList.add('hidden');
+  }
+});
+
 document.querySelectorAll('.reaction-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     const emoji = btn.dataset.emoji;
     socket.emit('reaction', { roomId, emoji });
+    document.getElementById('emojiPicker').classList.add('hidden');
     // Pas d'affichage local ici : le serveur nous renvoie l'événement 'reaction'
     // à nous aussi, donc l'afficher ici en plus créerait un doublon.
   });
@@ -406,6 +419,34 @@ function spawnFloatingEmoji(emoji) {
   el.style.right = `${20 + Math.random() * 40}px`;
   reactionsLayer.appendChild(el);
   setTimeout(() => el.remove(), 2600);
+}
+
+// ---------- Caster (Chromecast / AirPlay) ----------
+const castBtn = document.getElementById('castBtn');
+
+if ('remote' in mainVideo) {
+  // Chrome / Edge : API Remote Playback, ouvre le sélecteur Chromecast natif
+  mainVideo.remote.watchAvailability((available) => {
+    castBtn.style.display = available ? 'inline-flex' : 'none';
+  }).catch(() => {
+    // Certains navigateurs ne supportent pas watchAvailability : on affiche quand même le bouton
+    castBtn.style.display = 'inline-flex';
+  });
+
+  castBtn.addEventListener('click', async () => {
+    try {
+      await mainVideo.remote.prompt();
+    } catch (err) {
+      console.warn('Cast annulé ou indisponible', err);
+    }
+  });
+} else if (typeof mainVideo.webkitShowPlaybackTargetPicker === 'function') {
+  // Safari : AirPlay
+  castBtn.style.display = 'inline-flex';
+  castBtn.textContent = '📺 AirPlay';
+  castBtn.addEventListener('click', () => {
+    mainVideo.webkitShowPlaybackTargetPicker();
+  });
 }
 
 // ---------- Copier le lien ----------

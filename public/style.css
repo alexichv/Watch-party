@@ -68,6 +68,8 @@ button:hover { background: #5a4bd1; }
 .controls button:hover, .uploadLabel:hover { background: #33333f; }
 .controls button.on { background: #6c5ce7; color: white; }
 .controls button.on:hover { background: #5a4bd1; }
+#castBtn { background: #26262f; }
+#castBtn:hover { background: #33333f; }
 .host-badge {
   background: #2a2410;
   color: #f0c040;
@@ -122,18 +124,7 @@ button:hover { background: #5a4bd1; }
   15% { opacity: 1; transform: translateY(-20px) scale(1.1); }
   100% { transform: translateY(-260px) scale(1); opacity: 0; }
 }
-.reaction-bar {
-  position: absolute;
-  bottom: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  background: rgba(20, 20, 28, 0.75);
-  backdrop-filter: blur(6px);
-  padding: 6px 8px;
-  border-radius: 999px;
-}
+
 .reaction-btn {
   background: none;
   border: none;
@@ -144,6 +135,32 @@ button:hover { background: #5a4bd1; }
   line-height: 1;
 }
 .reaction-btn:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.15); }
+
+.emoji-wrapper { position: relative; }
+#emojiToggleBtn {
+  background: #26262f;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  padding: 6px 8px;
+  cursor: pointer;
+  line-height: 1;
+}
+#emojiToggleBtn:hover { background: #33333f; }
+.emoji-picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: #1a1a22;
+  border: 1px solid #26262f;
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  gap: 2px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  z-index: 5;
+}
+.emoji-picker.hidden { display: none; }
 
 /* --- Playlist --- */
 .playlist-panel {
