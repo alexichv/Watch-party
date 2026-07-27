@@ -426,18 +426,14 @@ const castBtn = document.getElementById('castBtn');
 
 if ('remote' in mainVideo) {
   // Chrome / Edge : API Remote Playback, ouvre le sélecteur Chromecast natif
-  mainVideo.remote.watchAvailability((available) => {
-    castBtn.style.display = available ? 'inline-flex' : 'none';
-  }).catch(() => {
-    // Certains navigateurs ne supportent pas watchAvailability : on affiche quand même le bouton
-    castBtn.style.display = 'inline-flex';
-  });
-
+  // et lance lui-même la recherche des appareils sur le réseau
+  castBtn.style.display = 'inline-flex';
   castBtn.addEventListener('click', async () => {
     try {
       await mainVideo.remote.prompt();
     } catch (err) {
-      console.warn('Cast annulé ou indisponible', err);
+      console.warn('Cast annulé ou aucun appareil trouvé', err);
+      alert("Aucun appareil de cast trouvé sur le réseau (vérifie que ton Chromecast est sur le même Wi-Fi)");
     }
   });
 } else if (typeof mainVideo.webkitShowPlaybackTargetPicker === 'function') {
@@ -446,6 +442,13 @@ if ('remote' in mainVideo) {
   castBtn.textContent = '📺 AirPlay';
   castBtn.addEventListener('click', () => {
     mainVideo.webkitShowPlaybackTargetPicker();
+  });
+} else {
+  // Navigateur sans API de cast (ex: Firefox) : le bouton reste visible
+  // mais explique pourquoi ça ne marche pas plutôt que de rester muet
+  castBtn.style.display = 'inline-flex';
+  castBtn.addEventListener('click', () => {
+    alert("Ton navigateur ne supporte pas le cast direct. Essaie avec Chrome, Edge ou Safari.");
   });
 }
 

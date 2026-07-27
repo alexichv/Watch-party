@@ -16,6 +16,7 @@
       <div class="controls">
         <button id="toggleCamBtn" class="off">📷 Activer la caméra</button>
         <button id="toggleMicBtn" class="off">🎤 Activer le micro</button>
+        <button id="castBtn">📺 Caster</button>
         <label id="uploadLabel" class="uploadLabel" style="display:none">
           📁 Choisir une vidéo
           <input type="file" id="videoFileInput" accept="video/*" hidden />
@@ -29,15 +30,6 @@
         <div id="uploadStatus"></div>
         <video id="mainVideo" controls></video>
         <div id="reactionsLayer" class="reactions-layer"></div>
-        <div class="reaction-bar">
-          <button class="reaction-btn" data-emoji="😂">😂</button>
-          <button class="reaction-btn" data-emoji="😍">😍</button>
-          <button class="reaction-btn" data-emoji="😱">😱</button>
-          <button class="reaction-btn" data-emoji="👏">👏</button>
-          <button class="reaction-btn" data-emoji="🔥">🔥</button>
-          <button class="reaction-btn" data-emoji="😢">😢</button>
-          <button class="reaction-btn" data-emoji="❤️">❤️</button>
-        </div>
       </section>
 
       <aside class="side-panel">
@@ -52,6 +44,18 @@
           <div id="chatMessages" class="chat-messages"></div>
           <form id="chatForm" class="chat-form">
             <input id="chatInput" placeholder="Écris un message..." autocomplete="off" />
+            <div class="emoji-wrapper">
+              <button type="button" id="emojiToggleBtn" title="Réactions">😀</button>
+              <div id="emojiPicker" class="emoji-picker hidden">
+                <button class="reaction-btn" data-emoji="😂">😂</button>
+                <button class="reaction-btn" data-emoji="😍">😍</button>
+                <button class="reaction-btn" data-emoji="😱">😱</button>
+                <button class="reaction-btn" data-emoji="👏">👏</button>
+                <button class="reaction-btn" data-emoji="🔥">🔥</button>
+                <button class="reaction-btn" data-emoji="😢">😢</button>
+                <button class="reaction-btn" data-emoji="❤️">❤️</button>
+              </div>
+            </div>
             <button type="submit">Envoyer</button>
           </form>
         </div>
